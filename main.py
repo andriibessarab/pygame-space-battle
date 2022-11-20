@@ -1,5 +1,6 @@
 import pygame
 import os
+pygame.font.init()
 
 # Window params
 WIDTH, HEIGHT = 900, 500  # W & H of app
@@ -12,9 +13,13 @@ VEL = 5
 BULLET_VEL = 7
 MAX_BULLETS = 4
 
+# Fonts
+FONT_HEALTH = pygame.font.SysFont("comicsans", 25)
+
 # Colors
 BACKGROUND_COLOR = (255, 255, 255)
 BORDER_COLOR = (0, 0, 0)
+WHITE_COLOR = (255, 255, 255)
 YELLOW_SIDE_COLOR = (255, 253, 84)
 RED_SIDE_COLOR = (234, 51, 49)
 
@@ -37,7 +42,7 @@ BACKGROUND = pygame.transform.scale(
 )
 SPACESHIP_YELLOW = pygame.transform.rotate(
     pygame.transform.scale(
-       IMG_SPACESHIP_YELLOW,  # Path to IMG
+        IMG_SPACESHIP_YELLOW,  # Path to IMG
         (SPACESHIP_WIDTH, SPACESHIP_HEIGHT)  # Width & Height of img
     ),
     90  # Rotation angle
@@ -52,12 +57,22 @@ SPACESHIP_RED = pygame.transform.rotate(
 
 
 # Draw window
-def draw_window(yellow, red, yellow_bullets, red_bullets):
+def draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health, red_health):
+    # Draw layout
     WIN.blit(BACKGROUND, (0, 0))
     pygame.draw.rect(WIN, BORDER_COLOR, BORDER)
+
+    # Draw scores
+    yellow_health_text = FONT_HEALTH.render(f"Health: {yellow_health}", True, WHITE_COLOR)
+    red_health_text = FONT_HEALTH.render(f"Health: {red_health}", True, WHITE_COLOR)
+    WIN.blit(yellow_health_text, (10, 10))
+    WIN.blit(red_health_text, (WIDTH - red_health_text.get_width() - 10, 10))
+
+    # Draw spaceships
     WIN.blit(SPACESHIP_YELLOW, (yellow.x, yellow.y))
     WIN.blit(SPACESHIP_RED, (red.x, red.y))
 
+    # Draw bullets
     for bullet in yellow_bullets:
         pygame.draw.rect(WIN, YELLOW_SIDE_COLOR, bullet)
 
@@ -118,6 +133,9 @@ def main():
     red_bullets = []
     yellow_bullets = []
 
+    red_health = 10
+    yellow_health = 10
+
     clock = pygame.time.Clock()
     run = True  # When false, game terminates
     while run:
@@ -135,6 +153,21 @@ def main():
                 if event.key == pygame.K_SLASH and MAX_BULLETS >= len(red_bullets):
                     bullet = pygame.Rect(red.x, red.y + red.height//2 - 2, 10, 5)
                     red_bullets.append(bullet)
+            if event.type == RED_HIT:
+                red_health -= 1
+            if event.type == YELLOW_HIT:
+                yellow_health -= 1
+
+        winner_text = ""
+        # Check if not health left
+        if red_health <= 0:
+            winner_text = "Yellow Wins"
+        if yellow_health <= 0:
+            winner_text = "Yellow Wins"
+
+        # Check if either won
+        if winner_text != "":
+            pass  # SOMEONE WON
 
         keys_pressed = pygame.key.get_pressed()  # Get all pressed keys
 
@@ -145,7 +178,7 @@ def main():
         # Handle bullets
         bullets_handle(yellow_bullets, red_bullets, yellow, red)
 
-        draw_window(yellow, red, yellow_bullets, red_bullets)  # Draw window
+        draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health,  red_health)  # Draw window
 
     pygame.quit()
 
