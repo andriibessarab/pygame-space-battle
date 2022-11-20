@@ -18,25 +18,33 @@ BORDER_COLOR = (0, 0, 0)
 YELLOW_SIDE_COLOR = (255, 253, 84)
 RED_SIDE_COLOR = (234, 51, 49)
 
+# Images
+IMG_SPACESHIP_YELLOW = pygame.image.load(os.path.join("assets", "spaceship_yellow.png"))
+IMG_SPACESHIP_RED = pygame.image.load(os.path.join("assets", "spaceship_red.png"))
+IMG_SPACE = pygame.image.load(os.path.join("assets", "background.png"))
+
 # Custom events
 YELLOW_HIT = pygame.USEREVENT + 1
 RED_HIT = pygame.USEREVENT + 2
 
+SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40
+
 # Objects
 BORDER = pygame.Rect(WIDTH//2 - 5, 0, 10, HEIGHT)
-
-# Spaceships
-SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40
+BACKGROUND = pygame.transform.scale(
+    IMG_SPACE,
+    (WIDTH, HEIGHT)
+)
 SPACESHIP_YELLOW = pygame.transform.rotate(
     pygame.transform.scale(
-        pygame.image.load(os.path.join("assets", "spaceship_yellow.png")),  # Path to IMG
+       IMG_SPACESHIP_YELLOW,  # Path to IMG
         (SPACESHIP_WIDTH, SPACESHIP_HEIGHT)  # Width & Height of img
     ),
     90  # Rotation angle
 )
 SPACESHIP_RED = pygame.transform.rotate(
     pygame.transform.scale(
-        pygame.image.load(os.path.join("assets", "spaceship_red.png")),  # Path to IMG
+        IMG_SPACESHIP_RED,  # Path to IMG
         (SPACESHIP_WIDTH, SPACESHIP_HEIGHT)  # Width & Height of img
     ),
     270  # Rotation angle
@@ -45,7 +53,7 @@ SPACESHIP_RED = pygame.transform.rotate(
 
 # Draw window
 def draw_window(yellow, red, yellow_bullets, red_bullets):
-    WIN.fill(BACKGROUND_COLOR)
+    WIN.blit(BACKGROUND, (0, 0))
     pygame.draw.rect(WIN, BORDER_COLOR, BORDER)
     WIN.blit(SPACESHIP_YELLOW, (yellow.x, yellow.y))
     WIN.blit(SPACESHIP_RED, (red.x, red.y))
