@@ -1,6 +1,7 @@
 import pygame
 import os
 pygame.font.init()
+pygame.mixer.init()
 
 # Window params
 WIDTH, HEIGHT = 900, 500  # W & H of app
@@ -12,6 +13,16 @@ FPS = 60
 VEL = 5
 BULLET_VEL = 7
 MAX_BULLETS = 4
+
+# Sounds
+SOUND_BG_GAME = pygame.mixer.Sound(os.path.join("assets", "game_bg_soundtrack.mp3"))
+SOUND_BULLET_HIT = pygame.mixer.Sound(os.path.join("assets", "bullet_fire_sound.mp3"))
+SOUND_BULLET_FIRE = pygame.mixer.Sound(os.path.join("assets", "bullet_hit_sound.mp3"))
+
+# Sounds volume
+SOUND_BG_GAME.set_volume(0.1)
+SOUND_BULLET_HIT.set_volume(0.2)
+SOUND_BULLET_FIRE.set_volume(0.2)
 
 # Fonts
 FONT_HEALTH = pygame.font.SysFont("comicsans", 25)
@@ -160,14 +171,20 @@ def main():
                 if event.key == pygame.K_q and MAX_BULLETS >= len(yellow_bullets):
                     bullet = pygame.Rect(yellow.x + yellow.width, yellow.y + yellow.height//2 - 2, 10, 5)
                     yellow_bullets.append(bullet)
+                    pygame.mixer.Channel(1).play(SOUND_BULLET_FIRE)
                 if event.key == pygame.K_SLASH and MAX_BULLETS >= len(red_bullets):
                     bullet = pygame.Rect(red.x, red.y + red.height//2 - 2, 10, 5)
                     red_bullets.append(bullet)
+                    pygame.mixer.Channel(2).play(SOUND_BULLET_FIRE)
             if event.type == RED_HIT:
                 red_health -= 1
+                pygame.mixer.Channel(2).play(SOUND_BULLET_HIT)
             if event.type == YELLOW_HIT:
                 yellow_health -= 1
+                pygame.mixer.Channel(1).play(SOUND_BULLET_HIT)
 
+        if not pygame.mixer.Channel(0).get_busy():
+            pygame.mixer.Channel(0).play(SOUND_BG_GAME)
         # Check if either side lost/won
         winner_text = ""
         if red_health <= 0:
