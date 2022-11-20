@@ -15,6 +15,7 @@ MAX_BULLETS = 4
 
 # Fonts
 FONT_HEALTH = pygame.font.SysFont("comicsans", 25)
+FONT_WINNER = pygame.font.SysFont("comicsans", 100)
 
 # Colors
 BACKGROUND_COLOR = (255, 255, 255)
@@ -82,6 +83,14 @@ def draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health, red_hea
     pygame.display.update()
 
 
+# Draw winner screen
+def draw_winner(text):
+    winner_text = FONT_WINNER.render(text, True, WHITE_COLOR)
+    WIN.blit(winner_text, (WIDTH//2 - winner_text.get_width()//2, HEIGHT//2 - winner_text.get_height()//2))
+    pygame.display.update()
+    pygame.time.delay(2000)  # Restart game after 2 sec
+
+
 # Movement for left handle(yellow ship)
 def movement_handle_left(keys_pressed, yellow):
     if keys_pressed[pygame.K_a] and yellow.x - VEL > 0:  # Left
@@ -146,6 +155,7 @@ def main():
             # Quit
             if event.type == pygame.QUIT:
                 run = False
+                pygame.quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q and MAX_BULLETS >= len(yellow_bullets):
                     bullet = pygame.Rect(yellow.x + yellow.width, yellow.y + yellow.height//2 - 2, 10, 5)
@@ -158,16 +168,15 @@ def main():
             if event.type == YELLOW_HIT:
                 yellow_health -= 1
 
+        # Check if either side lost/won
         winner_text = ""
-        # Check if not health left
         if red_health <= 0:
             winner_text = "Yellow Wins"
-        if yellow_health <= 0:
+        elif yellow_health <= 0:
             winner_text = "Yellow Wins"
-
-        # Check if either won
         if winner_text != "":
-            pass  # SOMEONE WON
+            draw_winner(winner_text)
+            break
 
         keys_pressed = pygame.key.get_pressed()  # Get all pressed keys
 
@@ -180,7 +189,7 @@ def main():
 
         draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health,  red_health)  # Draw window
 
-    pygame.quit()
+    main()
 
 
 if __name__ == '__main__':
