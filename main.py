@@ -1,17 +1,19 @@
 import pygame
 import os
+import random
+
 pygame.font.init()
 pygame.mixer.init()
 
 # Window params
-WIDTH, HEIGHT = 900, 500  # W & H of app
+WIDTH, HEIGHT = 1280, 1024  # W & H of app
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Space Battle")
 
 # Global Game Settings
 FPS = 60
-VEL = 5
-BULLET_VEL = 7
+VEL = 7
+BULLET_VEL = 12
 MAX_BULLETS = 4
 
 # Sounds
@@ -38,19 +40,25 @@ RED_SIDE_COLOR = (234, 51, 49)
 # Images
 IMG_SPACESHIP_YELLOW = pygame.image.load(os.path.join("assets", "spaceship_yellow.png"))
 IMG_SPACESHIP_RED = pygame.image.load(os.path.join("assets", "spaceship_red.png"))
-IMG_SPACE = pygame.image.load(os.path.join("assets", "background.png"))
+IMG_SPACE = pygame.image.load(os.path.join("assets", "bg_frames", "f0.png"))
+IMG_BULLET_POWERUP = pygame.image.load(os.path.join("assets", "bullet_powerup.png"))
 
 # Custom events
 YELLOW_HIT = pygame.USEREVENT + 1
 RED_HIT = pygame.USEREVENT + 2
 
-SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 55, 40
+SPACESHIP_WIDTH, SPACESHIP_HEIGHT = 150, 100
+BULLET_WIDTH, BULLET_HEIGHT = 20, 12
 
 # Objects
 BORDER = pygame.Rect(WIDTH//2 - 5, 0, 10, HEIGHT)
 BACKGROUND = pygame.transform.scale(
     IMG_SPACE,
     (WIDTH, HEIGHT)
+)
+BULLET_POWERUP = pygame.transform.scale(
+    IMG_BULLET_POWERUP,  # Path to IMG
+    (WIDTH * 0.05, HEIGHT * 0.05)  # Width & Height of img
 )
 SPACESHIP_YELLOW = pygame.transform.rotate(
     pygame.transform.scale(
@@ -75,8 +83,8 @@ def draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health, red_hea
     pygame.draw.rect(WIN, BORDER_COLOR, BORDER)
 
     # Draw scores
-    yellow_health_text = FONT_HEALTH.render(f"Health: {yellow_health}", True, WHITE_COLOR)
-    red_health_text = FONT_HEALTH.render(f"Health: {red_health}", True, WHITE_COLOR)
+    yellow_health_text = FONT_HEALTH.render(f"HP: {yellow_health}", True, WHITE_COLOR)
+    red_health_text = FONT_HEALTH.render(f"HP: {red_health}", True, WHITE_COLOR)
     WIN.blit(yellow_health_text, (10, 10))
     WIN.blit(red_health_text, (WIDTH - red_health_text.get_width() - 10, 10))
 
@@ -150,11 +158,14 @@ def main():
     # Game objects
     yellow = pygame.Rect(100, 300, SPACESHIP_WIDTH, SPACESHIP_HEIGHT)
     red = pygame.Rect(700, 300, SPACESHIP_WIDTH, SPACESHIP_HEIGHT)
+
     red_bullets = []
     yellow_bullets = []
 
     red_health = 10
     yellow_health = 10
+
+    bullet_powerups = []
 
     clock = pygame.time.Clock()
     run = True  # When false, game terminates
@@ -169,11 +180,11 @@ def main():
                 pygame.quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_q and MAX_BULLETS >= len(yellow_bullets):
-                    bullet = pygame.Rect(yellow.x + yellow.width, yellow.y + yellow.height//2 - 2, 10, 5)
+                    bullet = pygame.Rect(yellow.x + yellow.width, yellow.y + yellow.height//2 - 2, BULLET_WIDTH, BULLET_HEIGHT)
                     yellow_bullets.append(bullet)
                     pygame.mixer.Channel(1).play(SOUND_BULLET_FIRE)
                 if event.key == pygame.K_SLASH and MAX_BULLETS >= len(red_bullets):
-                    bullet = pygame.Rect(red.x, red.y + red.height//2 - 2, 10, 5)
+                    bullet = pygame.Rect(red.x, red.y + red.height//2 - 2, BULLET_WIDTH, BULLET_HEIGHT)
                     red_bullets.append(bullet)
                     pygame.mixer.Channel(2).play(SOUND_BULLET_FIRE)
             if event.type == RED_HIT:
@@ -183,8 +194,10 @@ def main():
                 yellow_health -= 1
                 pygame.mixer.Channel(1).play(SOUND_BULLET_HIT)
 
+        # Always have bg music
         if not pygame.mixer.Channel(0).get_busy():
             pygame.mixer.Channel(0).play(SOUND_BG_GAME)
+
         # Check if either side lost/won
         winner_text = ""
         if red_health <= 0:
@@ -203,6 +216,10 @@ def main():
 
         # Handle bullets
         bullets_handle(yellow_bullets, red_bullets, yellow, red)
+
+        # Generate bullet powerup every few seconds
+        #if random.randint(0, 200) == 1:
+        #   bullet_powerup = pygame.(yellow.x + yellow.width, yellow.y + yellow.height // 2 - 2, 10, 5)
 
         draw_window(yellow, red, yellow_bullets, red_bullets, yellow_health,  red_health)  # Draw window
 
