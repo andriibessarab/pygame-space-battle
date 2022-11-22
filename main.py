@@ -203,7 +203,7 @@ def main():
         if red_health <= 0:
             winner_text = "Yellow Wins"
         elif yellow_health <= 0:
-            winner_text = "Yellow Wins"
+            winner_text = "Red Wins"
         if winner_text != "":
             draw_winner(winner_text)
             break
