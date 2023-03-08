@@ -18,6 +18,20 @@ python3 main.py
 ```
 Have fun playing Space Battle!
 
+### Controls
+- Player 1:
+Move left: `A`
+Move right: `D`
+Move up: `W`
+Move down: `S`
+Shoot: `Q`
+- Player 2:
+Move left: `Left Arrow`
+Move right: `Right Arrow`
+Move up: `Up Arrow`
+Move down: `Down Arrow`
+Shoot: `?`
+
 ### Collaborators
 - [Andrii Bessarab](https://github.com/andriibessarab)
 
